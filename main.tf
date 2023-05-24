@@ -1,6 +1,6 @@
 provider "aws" {
   region = "us-east-1"
-  profile = "terraform-user"
+  #profile = "terraform"
 }
 
 # Create VPC
@@ -463,13 +463,13 @@ resource "aws_efs_file_system" "efsWordPress" {
 # Launch a Webserver Instance hosting WordPress in it.
 resource "aws_instance" "wordpress" {
   # AMI ID - Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
-  ami           = data.aws_ami.amazon-linux-2.id
+  ami           = "ami-06a0cd9728546d178"
   instance_type =  "t2.micro"
   subnet_id     = aws_subnet.public-subnet-1.id
   availability_zone  = "us-east-1a"
   user_data = file("webserver.sh")
 
-  key_name = "amandakey"
+  key_name = "Iankeypair"
 
   # Security groups to use
   vpc_security_group_ids = [aws_security_group.webserver-security-group.id]
@@ -482,13 +482,13 @@ resource "aws_instance" "wordpress" {
 # Launch a Webserver Instance hosting WordPress in it.
 resource "aws_instance" "wordpress1" {
   # AMI ID - Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
-  ami           = data.aws_ami.amazon-linux-2.id
+  ami           = "ami-06a0cd9728546d178"
   instance_type =  "t2.micro"
   subnet_id     = aws_subnet.public-subnet-2.id
   availability_zone  = "us-east-1b"
   user_data = file("webserver.sh")
 
-  key_name = "amanda-key"
+  key_name = "Iankeypair"
 
   # Security groups to use
   vpc_security_group_ids = [aws_security_group.webserver-security-group.id]
@@ -498,8 +498,8 @@ resource "aws_instance" "wordpress1" {
   }
  
 }
-resource "aws_s3_bucket" "schoolweb" {
-  bucket = "school-webs"
+resource "aws_s3_bucket" "cherishschoolweb" {
+  bucket = "cherishschool-web"
 
   tags = {
     Name        = "My bucket"
@@ -547,22 +547,22 @@ resource "aws_sns_topic" "user_updates" {
 }
 # get hosted zone details
 # terraform aws data  hosted zone
-data "aws_route53_zone" "hosted_zone" {
-  name         = var.domain_name
-}
-# create a record set in route 53
-# terraform aws route 53 record
-resource "aws_route53_record" "site_domain" {
-  zone_id = data.aws_route53_zone.hosted_zone.zone_id 
-  name    = var.record_name
-  type    = "A"
+# data "aws_route53_zone" "hosted_zone" {
+#   name         = var.domain_name
+# }
+# # create a record set in route 53
+# # terraform aws route 53 record
+# resource "aws_route53_record" "site_domain" {
+#   zone_id = data.aws_route53_zone.hosted_zone.zone_id 
+#   name    = var.record_name
+#   type    = "A"
 
-   alias {
-    name                   =  aws_elb.application_load_balancer.dns_name
-    zone_id                = aws_elb.application_load_balancer.zone_id
-    evaluate_target_health = true
-   }
-}
+#    alias {
+#     name                   =  aws_elb.application_load_balancer.dns_name
+#     zone_id                = aws_elb.application_load_balancer.zone_id
+#     evaluate_target_health = true
+#    }
+# }
 # create ebs
 # terraform aws create ebs
 resource "aws_ebs_volume" "volume_for_instances" {
